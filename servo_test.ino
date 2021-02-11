@@ -25,10 +25,10 @@ void loop() {
   //pwm.setPWM(RIGHT_SERVO,0,angleToPulse_Right(theta2));
   //float X =
   delay(6000);
-  Serial.println("left: ");
-  Serial.print(theta3);
-  Serial.print("\n right: ");
-  Serial.print(theta2);
+  Serial.print("left: ");
+  Serial.println(theta3);
+  Serial.print("right: ");
+  Serial.println(theta2);
 }
 
 int startingPosition(){
