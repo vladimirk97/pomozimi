@@ -11,11 +11,11 @@
 #define BASE_SERVOMAX_ANGLE 180
 
 #define LEFT_SERVOSTART 290       //90 degrees at 290   //1 degree = 2.33.
-#define LEFT_SERVOMIN 460 //120
-#define LEFT_SERVOMAX 160 //420
+#define LEFT_SERVOMIN 460  //120
+#define LEFT_SERVOMAX 132  //160 //420
 #define LEFT_SERVOSTART_ANGLE 90
 #define LEFT_SERVOMIN_ANGLE 17
-#define LEFT_SERVOMAX_ANGLE 158
+#define LEFT_SERVOMAX_ANGLE 170  //158
 
 #define RIGHT_SERVOSTART 280     //90 degrees at 280   //1 degree = 2.33.
 #define RIGHT_SERVOMIN 180
@@ -24,7 +24,7 @@
 #define RIGHT_SERVOMIN_ANGLE 47     //angles viewed from left motor side
 #define RIGHT_SERVOMAX_ANGLE 141
     
-#define GRIPPER_OPEN 150
+#define GRIPPER_OPEN 170
 #define GRIPPER_CLOSED 260
 
 #define SERVO_FREQ 50

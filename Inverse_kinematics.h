@@ -20,25 +20,28 @@ const float starting_Z_distance = 135.0; // Starting position distance in the Z 
 float check_Y(float Y, float X){
   
   if(Y < 0.0){
-    return atan(Y / (X + x_offset)) * 180 / Pi;
+    return atan( (X /*+ x_offset*/) / abs(Y) ) * 180 / Pi;
   } 
   
   if(Y == 0.0){
     return 90.0 ;
   } 
 
-   return atan(Y / (X + x_offset)) * 180 / Pi + 90.0;
+   return atan( Y / (X /*+ x_offset*/)) * 180 / Pi + 90.0;
   
 } 
 
 // Calculating the distance between left/right servo joints to the joint between the gripper and forearm in the XY axis
 float calculateR1(float X, float Y, float theta1){
-  return sqrt( pow((X - l5 * sin(theta1*Pi/180) - l1 * sin(theta1*Pi/180)) , 2) + pow((Y - l5 * cos(theta1*Pi/180) - l1 * cos(theta1*Pi/180)) , 2));
+  if(Y <= 0.0){ 
+    return sqrt( pow((X - l5 * sin(theta1 * Pi/180) - l1 * sin(theta1 * Pi/180)) , 2) + pow(( abs(Y) - l5 * cos(theta1 * Pi/180) - l1 * cos(theta1 * Pi/180)) , 2));
+  }
+  return sqrt( pow((X - l5 * cos((theta1 - 90) * Pi/180) - l1 * cos((theta1 - 90) * Pi/180)) , 2) + pow(( Y - l5 * sin((theta1 - 90) * Pi/180) - l1 * sin((theta1 - 90) * Pi/180)) , 2));
 }
 
 // Calculating the distance between left/right servo joints to the joint between the gripper and forearm in the Z axis
 float calculateR2(float Z){
-  return Z - h1;
+  return abs(Z - h1);
 }
 
 // Calculating the hypotenuse of r1 and r2
@@ -48,7 +51,7 @@ float calculateR3(float r1, float r2){
 
 // Calculating the angle between r3 and l2 - Fi1
 float calculateFi1(float l2, float l3, float r3){
-  return acos(( pow(l3,2) - pow(l2,2) - pow(r3,2) ) / (-2 * l2 * r3)) * 180 / Pi;
+  return acos( ( pow(r3, 2) + pow(l2,2) - pow(l3, 2) ) / ( 2 * r3 * l2 ) ) * 180 / Pi;
 }
 
 // Calculating the angle between r1 and r3 - Fi2
@@ -58,22 +61,28 @@ float calculateFi2(float r1, float r2){
 
 // Calculating the angle between l2 and l3 - Fi3
 float calculateFi3(float l2, float l3, float r3){
-  return acos(( pow(r3,2) - pow(l2,2) - pow(l3,2) ) / (-2 * l2 * l3)) * 180 / Pi;
+  return acos( ( pow(l2,2) + pow(l3,2) - pow(r3, 2) ) / ( 2 * l2 * l3 ) ) * 180 / Pi;
 }
 
-// Calculating the rotational angle of the base servo - theta1
+// Calculating the rotational angle of the base servo - theta
 float calculateTheta1(float Y, float X){
   return check_Y(Y, X);
 }
 
 // Calculating the rotational angle of the right servo - theta2
-float calculateTheta2(float fi1, float fi2){
-  return 180.0 - ( fi1 + fi2 );
-}
+float calculateTheta2(float fi1, float fi2, float Z) {
+    
+    if (Z >= h1) {
+        return 180.0 - ( fi1 + fi2 );
+    }
+    
+    return 180.0 + fi2 - fi1;
 
+}
+    
 // Calculating the rotational angle of the left servo - theta3
-float calculateTheta3(float fi3){
-   return 180.0 - fi3;
+float calculateTheta3(float theta2, float fi3){
+   return 90.0 + theta2 - fi3;
 }
 
 // ima sad onda ovih par isto sto ne mora
@@ -86,15 +95,15 @@ float* inverse_kinematics_calculations(float X, float Y, float Z){
   int size = 3;
   float* thetas = malloc(sizeof(float) * size);
 
-  thetas[0] = calculateTheta1(Y, X);
+  thetas[0] = calculateTheta1(Y, X);  // thetas = { theta1, theta2, theta3 }
   float r1 = calculateR1(X, Y, thetas[0]); 
   float r2 = calculateR2(Z);
   float r3 = calculateR3(r1, r2);
   float fi1 = calculateFi1(l2, l3, r3);
   float fi2 = calculateFi2(r1, r2);
   float fi3 = calculateFi3(l2, l3, r3);
-  thetas[1] = calculateTheta2(fi1, fi2);
-  thetas[2] = calculateTheta3(fi3);
+  thetas[1] = calculateTheta2(fi1, fi2, Z);
+  thetas[2] = calculateTheta3(thetas[1], fi3);
 
   return thetas;
 }

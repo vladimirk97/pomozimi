@@ -14,6 +14,6 @@ float angleToPulse_Right(float ang) {
 }
 
 float angleToPulse_Gripper(float ang) {
-  float pulse = map(ang , 0 , 100 , GRIPPER_OPEN , GRIPPER_CLOSED);
+  float pulse = map(ang , 0 , 100 , GRIPPER_CLOSED , GRIPPER_OPEN);
   return pulse;
 }
